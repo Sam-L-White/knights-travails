@@ -28,6 +28,7 @@ const displayController = (() => {
                 let divClass = gameBoard.boardArray[x][y]
                 let div = document.createElement("div")
                 div.classList.add(`${divClass}`)
+                div.id = `${x},${y}`
                 gameContainer.appendChild(div)
             }
         }
