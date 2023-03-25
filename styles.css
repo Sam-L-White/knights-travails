@@ -111,4 +111,8 @@ table {
 
 .b{
     background-color: brown;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 75px;
+    font-size: 86px;
 }
