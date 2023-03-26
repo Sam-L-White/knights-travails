@@ -25,8 +25,10 @@ const displayController = (() => {
 
         for(x=0; x<8; x++){
             for(y=0; y<8; y++){
+
                 let divClass = gameBoard.boardArray[x][y]
                 let div = document.createElement("div")
+
                 div.classList.add(`${divClass}`)
                 div.id = `${y},${x}`
                 gameContainer.appendChild(div)
@@ -34,8 +36,34 @@ const displayController = (() => {
         }
     }
 
-    return{displayBoard}
+    const showPath = (path, moves) => {
+        let pathArray = path.split("->")
+        pathArray.shift()
 
+        let x = 1
+        pathArray.forEach(square => {
+            let boardSquare = document.getElementById(square)
+            boardSquare.textContent = x
+            x++
+        })
+
+        let prompt = document.querySelector(".prompt")
+        prompt.textContent = "Moves: " + moves
+
+        let pathDisplay = document.querySelector(".path")
+        pathDisplay.textContent = path
+
+        let resetButton = document.createElement("button")
+        resetButton.classList.add("reset")
+        resetButton.textContent = "Reset"
+
+        let container = document.querySelector(".gameControls")
+        container.appendChild(resetButton)
+
+        eventController.addResetEvent(resetButton)
+    }
+
+    return{displayBoard, showPath}
 })()
 
 const eventController = (() => {
@@ -43,14 +71,35 @@ const eventController = (() => {
     let knightSquare
     let targetSquare
 
+    const addResetEvent = (resetButton) => {
+        resetButton.addEventListener("click", () => {
+
+            let prompt = document.querySelector(".prompt")
+            prompt.textContent = "Choose starting square"
+
+            let pathDisplay = document.querySelector(".path")
+            pathDisplay.textContent = ""
+
+            let container = document.querySelector(".gameControls")
+            container.removeChild(resetButton)
+
+            eventController.addKnightEvents()
+        })
+    }
+
     const addKnightEvents = () => {
 
         let boardSquares = document.querySelectorAll(".gameboard div")
         boardSquares.forEach(square => {
 
+            square.textContent = ""
+
             square.addEventListener("click", (e) => {
 
                 e.target.textContent = "♞"
+
+                let prompt = document.querySelector(".prompt")
+                prompt.textContent = "Choose target square"
 
                 //Remove event listeners
                 let oldBoard = document.querySelector(".gameboard")
@@ -84,10 +133,11 @@ const eventController = (() => {
         })
     }
 
-    return{addKnightEvents, knightSquare}
+    return{addKnightEvents, addResetEvent, knightSquare}
 })()
 
 const gameController = (() => {
+
     displayController.displayBoard()
     eventController.addKnightEvents()
 
@@ -108,8 +158,8 @@ const gameController = (() => {
 
     const gameStart = (knightSquare, targetSquare) => {
         createMap()
-        let pathArray = knightMoves(knightSquare, targetSquare)
-        console.log(pathArray)
+        let result = knightMoves(knightSquare, targetSquare)
+        displayController.showPath(result.path, result.moves)
         
     }
 
@@ -182,8 +232,6 @@ const gameController = (() => {
             }
         }
     }
-
-
 
     return{gameStart}
 })()
