@@ -107,13 +107,61 @@ const gameController = (() => {
     let possibleLocations = []
 
     const gameStart = (knightSquare, targetSquare) => {
-        let pathArray = knightMoves(knightSquare, targetSquare)
-        console.log(allMoves)
         createMap()
+        let pathArray = knightMoves(knightSquare, targetSquare)
+        console.log(pathArray)
+        
     }
 
     const knightMoves = (knightSquare, targetSquare) => {
+        let queue = []
+        queue.push(knightSquare)
+        let visited = []
+        visited[knightSquare] = true
 
+        let edges = []
+        edges[knightSquare] = 0
+
+        let predecessors = []
+        predecessors[knightSquare] = null
+
+        const buildPath = (knightSquare, targetSquare, predecessors) => {
+            let stack = []
+            stack.push(targetSquare)
+
+            let u = predecessors[targetSquare]
+
+            while(u != knightSquare) {
+                stack.push(u);
+                u = predecessors[u];
+            }
+
+            stack.push(knightSquare)
+            let path = stack.reverse().join('->');
+
+            return path;
+        }
+
+        while(queue.length > 0){
+            let current = queue.shift()
+
+            if(current.toString() === targetSquare){
+                return{
+                    moves: edges[targetSquare],
+                    path: buildPath(knightSquare, targetSquare, predecessors)
+                }
+            }
+
+            let destinations = boardMap.get(current)
+            destinations.forEach(destination => {
+                if(!visited[destination.toString()]){
+                    visited[destination.toString()] = true
+                    queue.push(destination.toString())
+                    edges[destination.toString()] = edges[current] + 1
+                    predecessors[destination.toString()] = current
+                }
+            })
+        }
     }
 
     const createMap = () => {
@@ -133,7 +181,6 @@ const gameController = (() => {
                 possibleLocations = []
             }
         }
-        console.log(boardMap)
     }
 
 
